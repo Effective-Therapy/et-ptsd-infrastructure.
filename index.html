@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ET Infrastructure: PTSD Protocol</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #f8fafc; }
+        .logic-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); }
+        .glimmer-glow { box-shadow: 0 0 20px rgba(45, 212, 191, 0.2); }
+    </style>
+</head>
+<body x-data="{
+    layer: 1,
+    problem: 'The Loop',
+    emergency: false,
+    showAuth: false,
+    events: []
+}">
+
+    <nav class="fixed top-0 w-full bg-black/80 backdrop-blur-xl border-b border-white/5 z-[100] p-4 flex justify-between items-center">
+        <div class="font-bold tracking-tighter text-teal-400 uppercase italic">ET: Continuity Stack</div>
+        <button @click="emergency = true" class="px-3 py-1 rounded bg-rose-600/20 text-rose-500 text-[10px] font-bold border border-rose-500/50 uppercase">Trigger High-Arousal Protocol</button>
+    </nav>
+
+    <main class="max-w-xl mx-auto pt-24 pb-40 px-6">
+
+        <div class="mb-12" x-show="layer >= 1">
+            <h2 class="text-[10px] font-bold text-teal-500 uppercase tracking-widest mb-4">Module 01: Identity Decoupling</h2>
+            <div class="logic-card rounded-[2.5rem] p-10 text-center shadow-2xl border-teal-500/20">
+                <p class="text-sm text-gray-400 mb-8 italic">"Objectifying the Intrusion: <span class='text-teal-400 font-bold' x-text='problem'></span>"</p>
+                <button @click="events.unshift({t: 'Decouple', d: 'Identified intrusion as external to self.'}); layer = 2"
+                        class="w-20 h-20 rounded-full border border-teal-500/30 flex items-center justify-center mx-auto hover:bg-teal-500/10 transition-all">
+                    <svg class="w-8 h-8 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                </button>
+                <p class="text-[9px] text-gray-600 mt-4 uppercase">Capture Intrusion Signal</p>
+            </div>
+        </div>
+
+        <div class="mb-12" x-show="layer >= 2" x-transition>
+            <h2 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Module 02: Agency Metrics</h2>
+            <div class="border-2 border-dashed border-white/10 rounded-[2.5rem] p-8 space-y-4">
+                <button @click="events.unshift({t: 'Agency', d: 'Utilized Grounding Protocol successfully.'}); layer = 3"
+                        class="w-full bg-white/5 p-5 rounded-2xl text-left border border-transparent hover:border-teal-500/50 transition-all">
+                    <p class="text-teal-400 font-bold text-[10px] uppercase">Record Agency Data Point</p>
+                    <p class="text-gray-400 text-xs mt-1 italic">The moment the person interrupted 'The Loop'.</p>
+                </button>
+            </div>
+        </div>
+
+        <div class="mb-12" x-show="layer >= 3" x-transition>
+            <div class="logic-card rounded-[2.5rem] p-8 text-center glimmer-glow border-teal-500/30">
+                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Relational Validation Network</h3>
+                <button @click="showAuth = true" class="w-full bg-teal-500 text-black py-4 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg">Verify Re-Authored Identity</button>
+            </div>
+        </div>
+
+        <div class="space-y-4">
+            <h3 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.3em]">Continuity Stream (Secure)</h3>
+            <template x-for="event in events">
+                <div class="p-4 bg-white/5 rounded-2xl flex justify-between items-center border border-white/5">
+                    <p class="text-xs text-gray-300 italic" x-text="event.d"></p>
+                    <span class="text-[8px] bg-teal-500/20 text-teal-400 px-2 py-1 rounded font-bold uppercase" x-text="event.t"></span>
+                </div>
+            </template>
+        </div>
+    </main>
+
+    <div x-show="showAuth" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-6" x-transition>
+        <div class="max-w-md w-full bg-slate-900 border border-teal-500/30 rounded-[3rem] p-10 text-center relative shadow-2xl">
+            <button @click="showAuth = false" class="absolute top-6 right-6 text-gray-500">CLOSE</button>
+            <p class="text-[10px] text-teal-500 font-bold uppercase tracking-widest mb-2">Verified Brief</p>
+            <h2 class="text-3xl text-white font-bold italic mb-8">The Observant Author</h2>
+            <div class="text-left space-y-4 mb-8">
+                <div class="bg-black/40 p-4 rounded-xl text-[10px] border border-white/5">
+                    <span class="text-teal-400 font-bold">PROTEST:</span> Successfully decoupled from High-Arousal Signal at 09:42.
+                </div>
+            </div>
+            <p class="text-[10px] text-gray-600 italic">"The loop is the problem. The person is the author."</p>
+        </div>
+    </div>
+
+    <div x-show="emergency" class="fixed inset-0 z-[300] bg-rose-950/95 backdrop-blur-3xl flex items-center justify-center p-8" x-transition>
+        <div class="max-w-md w-full text-center space-y-8">
+            <div class="w-20 h-20 bg-rose-600 rounded-full mx-auto flex items-center justify-center animate-pulse">
+                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            </div>
+            <h2 class="text-3xl font-bold">Biometric Spike Detected</h2>
+            <p class="text-rose-400 font-bold text-xs uppercase tracking-widest italic leading-relaxed">System triggering containment protocol.</p>
+            <div class="pt-8 space-y-4">
+                <button @click="emergency = false" class="w-full bg-white text-black py-4 rounded-2xl font-bold">Deploy Grounding Vault</button>
+                <button @click="emergency = false" class="w-full bg-transparent text-white/50 text-[10px] uppercase font-bold tracking-widest">Acknowledge Signal</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
