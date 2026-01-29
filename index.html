@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ET Continuity Infrastructure | Demo</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <title>Effective Therapy | Continuity Infrastructure Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Playfair+Display:ital,wght@1,400&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg-primary: #060D13;
@@ -23,120 +23,83 @@
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+        body { font-family: 'Inter', -apple-system, sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
 
         .demo-header { position: fixed; top: 0; left: 0; right: 0; background: rgba(6, 13, 19, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-subtle); padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 9999; }
-        .demo-logo { font-family: 'Merriweather', serif; font-size: 1.1rem; font-weight: 700; color: var(--theme-client); }
+        .demo-logo { font-family: 'Merriweather', serif; font-size: 1.1rem; font-weight: 700; }
+        .demo-logo span { opacity: 0.6; font-weight: 400; }
         .view-toggle { display: flex; background: var(--bg-secondary); border-radius: 8px; padding: 4px; }
-        .view-btn { padding: 0.5rem 1rem; border: none; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; }
+        .view-btn { padding: 0.5rem 1rem; border: none; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
         .view-btn.active { background: var(--bg-card); color: var(--text-primary); }
+        .view-btn.client.active { color: var(--theme-client); }
+        .view-btn.therapist.active { color: var(--theme-therapist); }
+
+        .floating-nav { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 1001; }
+        .floating-nav-toggle { width: 56px; height: 56px; border-radius: 50%; background: var(--theme-client); border: none; color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px rgba(80, 184, 163, 0.4); }
+        .floating-nav-menu { display: none; position: absolute; bottom: 70px; right: 0; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 1rem; min-width: 200px; max-height: 70vh; overflow-y: auto; box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3); }
+        .floating-nav-menu.open { display: block; }
+        .nav-section button { display: block; width: 100%; text-align: left; padding: 0.5rem 0.75rem; background: transparent; border: none; color: var(--text-secondary); font-size: 0.85rem; border-radius: 6px; cursor: pointer; }
 
         .container { max-width: 500px; margin: 0 auto; padding: 5rem 1.5rem 2rem; }
         .screen { display: none; }
         .screen.active { display: block; }
 
-        /* Infrastructure Styles */
-        .card { background: var(--bg-card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid var(--border-subtle); }
-        .btn { padding: 0.875rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: all 0.2s; }
+        .card { background: var(--bg-card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; }
+        .card-label { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--theme-client); margin-bottom: 0.75rem; }
+        .btn { padding: 0.875rem 1.5rem; border-radius: 8px; font-weight: 500; cursor: pointer; transition: all 0.2s; border: none; width: 100%; }
         .btn-primary { background: var(--theme-client); color: var(--bg-primary); }
         .btn-therapist { background: var(--theme-therapist); color: white; }
-        
-        .snapshot-stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.9rem; }
-        .stat-label { color: var(--text-muted); }
-        .stat-value { font-weight: 600; }
-        .trend-up { color: var(--success); font-size: 0.8rem; margin-left: 4px; }
 
-        /* Fall Alert Overlay */
-        .emergency-overlay { position: fixed; inset: 0; background: rgba(153, 27, 27, 0.95); z-index: 10000; display: none; align-items: center; justify-content: center; text-align: center; p: 2rem; }
-        .emergency-overlay.active { display: flex; }
+        /* Problem Slides & Stats */
+        .stat-big { font-family: 'Merriweather', serif; font-size: 3.5rem; font-weight: 700; color: var(--theme-client); line-height: 1; }
+        .stats-row { display: flex; justify-content: space-between; gap: 1rem; margin: 1.5rem 0; }
+        .problem-slide h1 { font-family: 'Merriweather', serif; font-size: 2rem; margin-bottom: 1.5rem; text-align: center; }
+        .problem-stat { text-align: center; }
+        .stat-label { color: var(--text-muted); font-size: 0.8rem; }
+
+        /* J-Snapshot Biometric Update */
+        .snapshot-stat { display: flex; justify-content: space-between; padding: 0.5rem 0; border-bottom: 1px solid var(--border-subtle); }
+        .snapshot-stat-label { color: var(--text-muted); font-size: 0.9rem; }
+        .snapshot-stat-value { font-weight: 500; }
+        .bio-tag { background: rgba(139, 92, 246, 0.1); color: var(--theme-therapist); font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-right: 5px; font-weight: bold; }
+
+        .emergency-banner { background: #991B1B; color: white; padding: 10px; text-align: center; font-weight: bold; font-size: 12px; margin-bottom: 15px; border-radius: 8px; cursor: pointer; display: none; }
     </style>
 </head>
 <body>
-
     <header class="demo-header">
-        <div class="demo-logo">ET INFRASTRUCTURE</div>
+        <div class="demo-logo">Effective Therapy <span>| Infrastructure</span></div>
         <div class="view-toggle">
-            <button class="view-btn client active" onclick="switchView('client')">Client</button>
-            <button class="view-btn therapist" onclick="switchView('therapist')">Witness</button>
+            <button class="view-btn client" onclick="switchView('client')">Client</button>
+            <button class="view-btn therapist" onclick="switchView('therapist')">Therapist</button>
         </div>
-        <button class="view-btn" style="color: #ef4444" onclick="document.getElementById('emergency').classList.add('active')">TEST FALL</button>
+        <button class="demo-reset" onclick="resetDemo()">Reset</button>
     </header>
 
-    <div id="emergency" class="emergency-overlay">
-        <div style="max-width: 400px">
-            <h1 style="font-size: 3rem">🚨</h1>
-            <h2 style="font-size: 2rem; margin-bottom: 1rem">Fall Detected (NJ)</h2>
-            <p style="margin-bottom: 2rem">Biometric sync indicates a hard fall at the New Jersey facility. Remote witness in Israel notified.</p>
-            <button class="btn btn-primary" onclick="document.getElementById('emergency').classList.remove('active')">Acknowledge & Call Facility</button>
+    <div class="floating-nav" id="floating-nav">
+        <button class="floating-nav-toggle" onclick="toggleNav()">☰</button>
+        <div class="floating-nav-menu" id="nav-menu">
+            <div class="nav-section">
+                <button onclick="goTo('problem-1')">01 Bottleneck</button>
+                <button onclick="goTo('problem-3')">03 Scale (Israel)</button>
+                <button onclick="goTo('client-home')">Client Home</button>
+                <button onclick="goTo('therapist-dashboard')">Therapist Hub</button>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <div id="client-home" class="screen active">
-            <div style="margin-bottom: 2rem">
-                <p style="color: var(--text-muted)">Protocol: Post-Stroke Recovery</p>
-                <h1 style="font-family: 'Merriweather', serif">The Navigator</h1>
+        <div id="problem-1" class="screen active">
+            <div class="problem-slide">
+                <h1>The Bottleneck</h1>
+                <div class="problem-stat"><div class="stat-big">1 hr</div><div class="stat-label">per week support</div></div>
+                <div class="problem-stat" style="margin-top: 20px;"><div class="stat-big">167 hr</div><div class="stat-label">per week alone</div></div>
+                <button class="btn btn-primary" style="margin-top: 30px;" onclick="showScreen('problem-3')">Next</button>
             </div>
-            <div class="card">
-                <p style="font-size: 0.75rem; color: var(--theme-client); font-weight: bold; margin-bottom: 0.5rem">IDENTITY DECOUPLING</p>
-                <h3>Current Status: Decoupled</h3>
-                <p style="margin-top: 0.5rem; font-size: 0.85rem">Signal: 'The Neuro-Static' is active but isolated.</p>
-            </div>
-            <button class="btn btn-primary" onclick="switchView('therapist')">View Witness Dashboard</button>
         </div>
 
-        <div id="therapist-dashboard" class="screen">
-            <div style="margin-bottom: 2rem">
-                <p style="color: var(--text-muted)">Remote Witness: Israel (IL)</p>
-                <h1 style="font-family: 'Merriweather', serif">Continuity Brief</h1>
-            </div>
-
-            <div class="card">
-                <p style="font-size: 0.75rem; color: var(--theme-therapist); font-weight: bold; margin-bottom: 1rem">BIO-CONTINUITY (NJ DATA)</p>
-                
-                <div class="snapshot-stat">
-                    <span class="stat-label">Smartwatch (HRV)</span>
-                    <span class="stat-value">Normal <span class="trend-up">Stable</span></span>
-                </div>
-                
-                <div class="snapshot-stat">
-                    <span class="stat-label">Cognitive Load (Muse)</span>
-                    <span class="stat-value">Regulated</span>
-                </div>
-
-                <div class="snapshot-stat">
-                    <span class="stat-label">Agency Data Points</span>
-                    <span class="stat-value">12 <span class="trend-up">↑ 4</span></span>
-                </div>
-            </div>
-
-            <div class="card">
-                <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold; margin-bottom: 0.5rem">CONTINUITY STREAM</p>
-                <div style="font-size: 0.85rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 0.5rem;">
-                    <strong>03:14 AM (IL):</strong> Smartwatch confirmed 'Independent Navigation' to dining hall.
-                </div>
-                <div style="font-size: 0.85rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
-                    <strong>Yesterday:</strong> Identity brief updated to 'Navigator'.
-                </div>
-            </div>
-            
-            <button class="btn btn-therapist" onclick="switchView('client')">Back to Primary View</button>
-        </div>
-    </div>
-
-    <script>
-        function switchView(view) {
-            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
-            
-            if (view === 'client') {
-                document.getElementById('client-home').classList.add('active');
-                document.querySelector('.view-btn.client').classList.add('active');
-            } else {
-                document.getElementById('therapist-dashboard').classList.add('active');
-                document.querySelector('.view-btn.therapist').classList.add('active');
-            }
-        }
-    </script>
-</body>
-</html>
+        <div id="problem-3" class="screen">
+            <div class="problem-slide">
+                <h1>Israel Recovery Gap</h1>
+                <div class="stats-row">
+                    <div class="problem-stat"><div style="font-size: 2rem; color: var(--theme-client); font-weight: bold;">70%</div><div class="
