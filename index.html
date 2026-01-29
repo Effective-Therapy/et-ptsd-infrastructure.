@@ -3,97 +3,140 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ET Infrastructure: PTSD Protocol</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <title>ET Continuity Infrastructure | Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background-color: #050505; color: #f8fafc; }
-        .logic-card { background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.05); }
-        .glimmer-glow { box-shadow: 0 0 20px rgba(45, 212, 191, 0.2); }
+        :root {
+            --bg-primary: #060D13;
+            --bg-secondary: #0A1628;
+            --bg-card: #0D1A24;
+            --text-primary: #E8E8E8;
+            --text-secondary: #B0B0B0;
+            --text-muted: #6B7280;
+            --border-subtle: rgba(255, 255, 255, 0.08);
+            --theme-client: #50B8A3;
+            --theme-therapist: #8B5CF6;
+            --theme-dim-client: rgba(80, 184, 163, 0.15);
+            --theme-dim-therapist: rgba(139, 92, 246, 0.15);
+            --warning: #F59E0B;
+            --success: #10B981;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg-primary); color: var(--text-primary); min-height: 100vh; line-height: 1.6; }
+
+        .demo-header { position: fixed; top: 0; left: 0; right: 0; background: rgba(6, 13, 19, 0.95); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-subtle); padding: 0.75rem 1.5rem; display: flex; justify-content: space-between; align-items: center; z-index: 9999; }
+        .demo-logo { font-family: 'Merriweather', serif; font-size: 1.1rem; font-weight: 700; color: var(--theme-client); }
+        .view-toggle { display: flex; background: var(--bg-secondary); border-radius: 8px; padding: 4px; }
+        .view-btn { padding: 0.5rem 1rem; border: none; background: transparent; color: var(--text-muted); font-size: 0.85rem; font-weight: 500; border-radius: 6px; cursor: pointer; }
+        .view-btn.active { background: var(--bg-card); color: var(--text-primary); }
+
+        .container { max-width: 500px; margin: 0 auto; padding: 5rem 1.5rem 2rem; }
+        .screen { display: none; }
+        .screen.active { display: block; }
+
+        /* Infrastructure Styles */
+        .card { background: var(--bg-card); border-radius: 12px; padding: 1.5rem; margin-bottom: 1rem; border: 1px solid var(--border-subtle); }
+        .btn { padding: 0.875rem 1.5rem; border-radius: 8px; font-weight: 600; cursor: pointer; border: none; width: 100%; transition: all 0.2s; }
+        .btn-primary { background: var(--theme-client); color: var(--bg-primary); }
+        .btn-therapist { background: var(--theme-therapist); color: white; }
+        
+        .snapshot-stat { display: flex; justify-content: space-between; padding: 0.75rem 0; border-bottom: 1px solid var(--border-subtle); font-size: 0.9rem; }
+        .stat-label { color: var(--text-muted); }
+        .stat-value { font-weight: 600; }
+        .trend-up { color: var(--success); font-size: 0.8rem; margin-left: 4px; }
+
+        /* Fall Alert Overlay */
+        .emergency-overlay { position: fixed; inset: 0; background: rgba(153, 27, 27, 0.95); z-index: 10000; display: none; align-items: center; justify-content: center; text-align: center; p: 2rem; }
+        .emergency-overlay.active { display: flex; }
     </style>
 </head>
-<body x-data="{
-    layer: 1,
-    problem: 'The Loop',
-    emergency: false,
-    showAuth: false,
-    events: []
-}">
+<body>
 
-    <nav class="fixed top-0 w-full bg-black/80 backdrop-blur-xl border-b border-white/5 z-[100] p-4 flex justify-between items-center">
-        <div class="font-bold tracking-tighter text-teal-400 uppercase italic">ET: Continuity Stack</div>
-        <button @click="emergency = true" class="px-3 py-1 rounded bg-rose-600/20 text-rose-500 text-[10px] font-bold border border-rose-500/50 uppercase">Trigger High-Arousal Protocol</button>
-    </nav>
-
-    <main class="max-w-xl mx-auto pt-24 pb-40 px-6">
-
-        <div class="mb-12" x-show="layer >= 1">
-            <h2 class="text-[10px] font-bold text-teal-500 uppercase tracking-widest mb-4">Module 01: Identity Decoupling</h2>
-            <div class="logic-card rounded-[2.5rem] p-10 text-center shadow-2xl border-teal-500/20">
-                <p class="text-sm text-gray-400 mb-8 italic">"Objectifying the Intrusion: <span class='text-teal-400 font-bold' x-text='problem'></span>"</p>
-                <button @click="events.unshift({t: 'Decouple', d: 'Identified intrusion as external to self.'}); layer = 2"
-                        class="w-20 h-20 rounded-full border border-teal-500/30 flex items-center justify-center mx-auto hover:bg-teal-500/10 transition-all">
-                    <svg class="w-8 h-8 text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
-                </button>
-                <p class="text-[9px] text-gray-600 mt-4 uppercase">Capture Intrusion Signal</p>
-            </div>
+    <header class="demo-header">
+        <div class="demo-logo">ET INFRASTRUCTURE</div>
+        <div class="view-toggle">
+            <button class="view-btn client active" onclick="switchView('client')">Client</button>
+            <button class="view-btn therapist" onclick="switchView('therapist')">Witness</button>
         </div>
+        <button class="view-btn" style="color: #ef4444" onclick="document.getElementById('emergency').classList.add('active')">TEST FALL</button>
+    </header>
 
-        <div class="mb-12" x-show="layer >= 2" x-transition>
-            <h2 class="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">Module 02: Agency Metrics</h2>
-            <div class="border-2 border-dashed border-white/10 rounded-[2.5rem] p-8 space-y-4">
-                <button @click="events.unshift({t: 'Agency', d: 'Utilized Grounding Protocol successfully.'}); layer = 3"
-                        class="w-full bg-white/5 p-5 rounded-2xl text-left border border-transparent hover:border-teal-500/50 transition-all">
-                    <p class="text-teal-400 font-bold text-[10px] uppercase">Record Agency Data Point</p>
-                    <p class="text-gray-400 text-xs mt-1 italic">The moment the person interrupted 'The Loop'.</p>
-                </button>
-            </div>
-        </div>
-
-        <div class="mb-12" x-show="layer >= 3" x-transition>
-            <div class="logic-card rounded-[2.5rem] p-8 text-center glimmer-glow border-teal-500/30">
-                <h3 class="text-xs font-bold text-gray-500 uppercase mb-4">Relational Validation Network</h3>
-                <button @click="showAuth = true" class="w-full bg-teal-500 text-black py-4 rounded-2xl font-bold text-xs uppercase tracking-widest shadow-lg">Verify Re-Authored Identity</button>
-            </div>
-        </div>
-
-        <div class="space-y-4">
-            <h3 class="text-[10px] font-bold text-gray-600 uppercase tracking-[0.3em]">Continuity Stream (Secure)</h3>
-            <template x-for="event in events">
-                <div class="p-4 bg-white/5 rounded-2xl flex justify-between items-center border border-white/5">
-                    <p class="text-xs text-gray-300 italic" x-text="event.d"></p>
-                    <span class="text-[8px] bg-teal-500/20 text-teal-400 px-2 py-1 rounded font-bold uppercase" x-text="event.t"></span>
-                </div>
-            </template>
-        </div>
-    </main>
-
-    <div x-show="showAuth" class="fixed inset-0 z-[200] bg-black/95 backdrop-blur-3xl flex items-center justify-center p-6" x-transition>
-        <div class="max-w-md w-full bg-slate-900 border border-teal-500/30 rounded-[3rem] p-10 text-center relative shadow-2xl">
-            <button @click="showAuth = false" class="absolute top-6 right-6 text-gray-500">CLOSE</button>
-            <p class="text-[10px] text-teal-500 font-bold uppercase tracking-widest mb-2">Verified Brief</p>
-            <h2 class="text-3xl text-white font-bold italic mb-8">The Observant Author</h2>
-            <div class="text-left space-y-4 mb-8">
-                <div class="bg-black/40 p-4 rounded-xl text-[10px] border border-white/5">
-                    <span class="text-teal-400 font-bold">PROTEST:</span> Successfully decoupled from High-Arousal Signal at 09:42.
-                </div>
-            </div>
-            <p class="text-[10px] text-gray-600 italic">"The loop is the problem. The person is the author."</p>
+    <div id="emergency" class="emergency-overlay">
+        <div style="max-width: 400px">
+            <h1 style="font-size: 3rem">🚨</h1>
+            <h2 style="font-size: 2rem; margin-bottom: 1rem">Fall Detected (NJ)</h2>
+            <p style="margin-bottom: 2rem">Biometric sync indicates a hard fall at the New Jersey facility. Remote witness in Israel notified.</p>
+            <button class="btn btn-primary" onclick="document.getElementById('emergency').classList.remove('active')">Acknowledge & Call Facility</button>
         </div>
     </div>
 
-    <div x-show="emergency" class="fixed inset-0 z-[300] bg-rose-950/95 backdrop-blur-3xl flex items-center justify-center p-8" x-transition>
-        <div class="max-w-md w-full text-center space-y-8">
-            <div class="w-20 h-20 bg-rose-600 rounded-full mx-auto flex items-center justify-center animate-pulse">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+    <div class="container">
+        <div id="client-home" class="screen active">
+            <div style="margin-bottom: 2rem">
+                <p style="color: var(--text-muted)">Protocol: Post-Stroke Recovery</p>
+                <h1 style="font-family: 'Merriweather', serif">The Navigator</h1>
             </div>
-            <h2 class="text-3xl font-bold">Biometric Spike Detected</h2>
-            <p class="text-rose-400 font-bold text-xs uppercase tracking-widest italic leading-relaxed">System triggering containment protocol.</p>
-            <div class="pt-8 space-y-4">
-                <button @click="emergency = false" class="w-full bg-white text-black py-4 rounded-2xl font-bold">Deploy Grounding Vault</button>
-                <button @click="emergency = false" class="w-full bg-transparent text-white/50 text-[10px] uppercase font-bold tracking-widest">Acknowledge Signal</button>
+            <div class="card">
+                <p style="font-size: 0.75rem; color: var(--theme-client); font-weight: bold; margin-bottom: 0.5rem">IDENTITY DECOUPLING</p>
+                <h3>Current Status: Decoupled</h3>
+                <p style="margin-top: 0.5rem; font-size: 0.85rem">Signal: 'The Neuro-Static' is active but isolated.</p>
             </div>
+            <button class="btn btn-primary" onclick="switchView('therapist')">View Witness Dashboard</button>
+        </div>
+
+        <div id="therapist-dashboard" class="screen">
+            <div style="margin-bottom: 2rem">
+                <p style="color: var(--text-muted)">Remote Witness: Israel (IL)</p>
+                <h1 style="font-family: 'Merriweather', serif">Continuity Brief</h1>
+            </div>
+
+            <div class="card">
+                <p style="font-size: 0.75rem; color: var(--theme-therapist); font-weight: bold; margin-bottom: 1rem">BIO-CONTINUITY (NJ DATA)</p>
+                
+                <div class="snapshot-stat">
+                    <span class="stat-label">Smartwatch (HRV)</span>
+                    <span class="stat-value">Normal <span class="trend-up">Stable</span></span>
+                </div>
+                
+                <div class="snapshot-stat">
+                    <span class="stat-label">Cognitive Load (Muse)</span>
+                    <span class="stat-value">Regulated</span>
+                </div>
+
+                <div class="snapshot-stat">
+                    <span class="stat-label">Agency Data Points</span>
+                    <span class="stat-value">12 <span class="trend-up">↑ 4</span></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <p style="font-size: 0.75rem; color: var(--text-muted); font-weight: bold; margin-bottom: 0.5rem">CONTINUITY STREAM</p>
+                <div style="font-size: 0.85rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 0.5rem;">
+                    <strong>03:14 AM (IL):</strong> Smartwatch confirmed 'Independent Navigation' to dining hall.
+                </div>
+                <div style="font-size: 0.85rem; padding: 0.5rem; background: rgba(255,255,255,0.05); border-radius: 8px;">
+                    <strong>Yesterday:</strong> Identity brief updated to 'Navigator'.
+                </div>
+            </div>
+            
+            <button class="btn btn-therapist" onclick="switchView('client')">Back to Primary View</button>
         </div>
     </div>
+
+    <script>
+        function switchView(view) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            
+            if (view === 'client') {
+                document.getElementById('client-home').classList.add('active');
+                document.querySelector('.view-btn.client').classList.add('active');
+            } else {
+                document.getElementById('therapist-dashboard').classList.add('active');
+                document.querySelector('.view-btn.therapist').classList.add('active');
+            }
+        }
+    </script>
 </body>
 </html>
